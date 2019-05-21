@@ -509,9 +509,14 @@ public class ProGuardMojo extends AbstractMojo {
 
 
 		if (includeDependency) {
-			@SuppressWarnings("unchecked")
-			List<Artifact> dependency = this.mavenProject.getCompileArtifacts();
-			for (Artifact artifact : dependency) {
+			for (Artifact artifact : (List<Artifact>) this.mavenProject.getDependencies()) {
+				// Basically accepts any dependency that isn't test scoped.
+				if (!Artifact.SCOPE_COMPILE.equals(artifact.getScope())
+						&& !Artifact.SCOPE_PROVIDED.equals(artifact.getScope())
+						&& !Artifact.SCOPE_RUNTIME.equals(artifact.getScope())
+						&& !Artifact.SCOPE_SYSTEM.equals(artifact.getScope())) {
+					continue;
+				}
 				// dependency filter
 				if (isExclusion(artifact)) {
 					continue;
